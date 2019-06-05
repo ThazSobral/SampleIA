@@ -12,45 +12,47 @@
 </head>
 <body>
     <script id="rendered-js">
-        var population, stats, track;
-        var targets = [];
-        var step = 0;
-        var lifetime = 1000; //tempo de vida das amostras
-        var generation = 1; //numero da gereções, que inicialmente começa em 1
-        var maxForce = 10; //velocidade das amostras
-        var populationSize = 10; //numero de amostras
-        var carsLeft = populationSize; 
-        var blocks = []; 
-        var block;
-        var collision;
-        var blockParams; //obstaculos no cenário
+        var population, stats, track
+        var targets = []
+        var step = 0
+        var lifetime = 1000 //tempo de vida das amostras
+        var generation = 1 //numero da gereções, que inicialmente começa em 1
+        var maxForce = 10 //velocidade das amostras
+        var populationSize = 100 //numero de amostras
+        var carsLeft = populationSize
+        var blocks = []
+        var block
+        var collision
+        var blockParams //obstaculos no cenário
         
         function setup() {
-          createCanvas(480, 380);
+          createCanvas(480, 380)
         
           blockParams = [
-          //{ x: -100, y: -150, w: 200, h: 200 },
-          //{ x: 140, y: -150, w: 200, h: 200 },
-          //{ x: width - 100, y: -150, w: 200, h: 200 },
-          //{ x: -100, y: 90, w: 200, h: 200 },
-          //{ x: 140, y: 90, w: 200, h: 200 },
-          //{ x: width - 100, y: 90, w: 200, h: 200 },
-          //{ x: -100, y: height - 50, w: 200, h: 200 },
-          //{ x: 140, y: height - 50, w: 200, h: 200 },
-          //{ x: width - 100, y: height - 50, w: 200, h: 200 }
-          ];
+          { x: -100, y: -150, w: 200, h: 200 },
+          { x: 140, y: -150, w: 200, h: 200 },
+          { x: width - 100, y: -150, w: 200, h: 200 },
+          { x: -100, y: 90, w: 200, h: 200 },
+          { x: 140, y: 90, w: 200, h: 200 },
+          { x: width - 100, y: 90, w: 200, h: 200 },
+          { x: -100, y: height - 50, w: 200, h: 200 },
+          { x: 140, y: height - 50, w: 200, h: 200 },
+          { x: width - 100, y: height - 50, w: 200, h: 200 }
+          ]
+                
+          population = new Population(width - 50, height - 70, 5, 10) //desenho da amostra
+          targets.push(new Target(120, 120, 20, 20)) //adiciona o ponto de objetivo
         
+          stats = new Stats() //cria os estados
+          
+          for (var i = 0; i < blockParams.length; i++) {
+            if (window.CP.shouldStopExecution(0)) {
+              //break
+            }
+            blocks.push(new Block(blockParams[i]))
+          }window.CP.exitedLoop(0)
         
-          population = new Population(width - 50, height - 70, 5, 10); //desenho da amostra
-          targets.push(
-          new Target(120, 120, 20, 20));
-        
-          stats = new Stats();
-          for (var i = 0; i < blockParams.length; i++) {if (window.CP.shouldStopExecution(0)) break;
-            blocks.push(new Block(blockParams[i]));
-          }window.CP.exitedLoop(0);
-        
-          collision = new Collision();
+          collision = new Collision()
         }
         
         function draw() {
