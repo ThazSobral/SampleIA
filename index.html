@@ -4,37 +4,46 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta http-equiv="X-UA-Compatible" content="ie=edge">
-  <script src="./codepen.js"></script>
-  <script src="./p5.min.js"></script>
-  <script src="./p5.dom.js"></script>
+  <script src="/scripts/codepen.js"></script>
+  <script src="/scripts/p5.min.js"></script>
+  <script src="/scripts/p5.dom.js"></script>
+
+  <title>IA</title>
+  <link rel = "icon" href = "/assets/brain.png" type = "svg">
+
   <style>
     body {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+
+      padding: 10px;
+
       background-color: black ;
       color: white;
       font-family: Arial, Helvetica, sans-serif;
     }
 
   </style>
-  <title>Document</title>
 </head>
 <body>
     <script id="rendered-js">
-        var population, stats, track //população, estados e rastreamento
-        var targets = [] //amostras alvos
-        var step = 0 //passos
-        var lifetime = 1000 //tempo de vida das amostras
-        var generation = 1 //numero da gereções, que inicialmente começa em 1
-        var maxForce = 2 //velocidade das amostras
-        var populationSize = 100 //numero de amostras
+        var population, stats, track
+        var targets = []
+        var step = 0
+        var lifetime = 1000
+        var generation = 1
+        var maxForce = 2
+        var populationSize = 100
         var carsLeft = populationSize
-        var blocks = [] //array para os blocos
-        var block //blocos
-        var collision //colisões
-        var blockParams //obstaculos no cenário
+        var blocks = []
+        var block
+        var collision
+        var blockParams
         
         function setup() {
-          createCanvas(640, 480)//define tamanho do display display
-          //define os obstáculos
+          createCanvas(640, 480)
           blockParams = [
           { x: -100, y: -150, w: 200, h: 200 },
           { x: 140, y: -150, w: 200, h: 200 },
@@ -47,12 +56,11 @@
           { x: width - 100, y: height - 50, w: 200, h: 200 }
           ]
                 
-          population = new Population(width - 50, height - 70, 5, 5) //desenho da amostra
-          targets.push(new Target(120, 120, 20, 20)) //adiciona o ponto de objetivo
+          population = new Population(width - 50, height - 70, 5, 5)
+          targets.push(new Target(120, 120, 20, 20))
         
-          stats = new Stats() //cria os estados
+          stats = new Stats()
           
-          //gera os obstáculos
           for (var i = 0; i < blockParams.length; i++) {
             if (window.CP.shouldStopExecution(0)) { 
               //break
@@ -63,112 +71,110 @@
           collision = new Collision()
         }
         
-        //função de desenho
         function draw() {
-          background(0, 0, 0);
+          background(0, 0, 0)
           targets.forEach(function (target) {
-            target.show();
-          });
+            target.show()
+          })
         
           blocks.forEach(function (block) {
-            block.show();
-          });
+            block.show()
+          })
         
           population.run();
         
-          step++;
-          stats.setSteps(step);
-          stats.setCarsCount(carsLeft);
+          step++
+          stats.setSteps(step)
+          stats.setCarsCount(carsLeft)
           if (step == lifetime || carsLeft <= 0) {
-            population.evaluate();
-            step = 0;
-            carsLeft = populationSize;
+            population.evaluate()
+            step = 0
+            carsLeft = populationSize
           }
         }
-        //para gerar os blocos
+
         function Block(params) {
-          this.width = params.w || 10;
-          this.height = params.h || 10;
-          this.x = params.x || 0;
-          this.y = params.y || 0;
+          this.width = params.w || 10
+          this.height = params.h || 10
+          this.x = params.x || 0
+          this.y = params.y || 0
         
           this.show = function () {
-            fill(27, 27, 27);
-            strokeWeight(3);
-            stroke(150, 135, 135);
-            rect(this.x, this.y, this.width, this.height);
-          };
+            fill(27, 27, 27)
+            strokeWeight(3)
+            stroke(150, 135, 135)
+            rect(this.x, this.y, this.width, this.height)
+          }
         }
         
-        function Collision() { //funções para colisão
-          this.detect = function (posX, posY) { //colisão detectada
+        function Collision() {
+          this.detect = function (posX, posY) {
         
-            for (var i = 0; i < blocks.length; i++) {if (window.CP.shouldStopExecution(1)) break; //se a execução estiver parada
-              if (posX > blocks[i].x && posX < blocks[i].x + blocks[i].width && posY > blocks[i].y && posY < blocks[i].y + blocks[i].height) { //se houver colisão
+            for (var i = 0; i < blocks.length; i++) {if (window.CP.shouldStopExecution(1)) break
+              if (posX > blocks[i].x && posX < blocks[i].x + blocks[i].width && posY > blocks[i].y && posY < blocks[i].y + blocks[i].height) {
                 // console.log(i) 
-                return true;
+                return true
               }
-            }window.CP.exitedLoop(1);
-          };
+            }window.CP.exitedLoop(1)
+          }
         }
         
-        function Car(x, y, w, h) { //nova amostra
-          this.width = w; //valor largura
-          this.length = h; //valor altura
-          this.position = createVector(x, y); //posição do vetor
-          this.velocity = createVector(); //velocidade do vetor
-          this.acceleration = createVector(); //aceleração do vetor
-          this.dna = new DNA(); //chama a função para criar novo dna
-          this.fitness = 0; //nota de fitness
-          this.complited = false; //se completar
-          this.disqualified = false; //se esta desqualificado
-          this.removed = false; //se foi removido
-          this.step = 0; //tempo de vida
-          this.targetId = 0; //identificação da amostra
-          this.color = '#22ff00'; //cor da amostra
-          this.finish = false; //se finalozou o teste
+        function Car(x, y, w, h) {
+          this.width = w
+          this.length = h
+          this.position = createVector(x, y)
+          this.velocity = createVector()
+          this.acceleration = createVector()
+          this.dna = new DNA()
+          this.fitness = 0
+          this.complited = false
+          this.disqualified = false
+          this.removed = false
+          this.step = 0
+          this.targetId = 0
+          this.color = '#22ff00'
+          this.finish = false
         
-          this.removeFromList = function () { //função pra remover a amostra
-            if (!this.removed) { //se removido for false
-              carsLeft--; 
-              this.removed = true;//coloca como removido
-              this.step = step; //atribui o tempo de vida no geral para avaliação
+          this.removeFromList = function () {
+            if (!this.removed) {
+              carsLeft--
+              this.removed = true
+              this.step = step
             }
-          };
+          }
         
-          this.crossover = function (partner) { //função de crossover
-            var child = new Car(x, y, w, h); //cria uma nova amostra (filho)
-            var genesLength = this.dna.getLength(); //pega o tamanho do dna
-            var midPoint = floor(random(genesLength)); //sorteia uma posição pegando o menor numero int
+          this.crossover = function (partner) {
+            var child = new Car(x, y, w, h)
+            var genesLength = this.dna.getLength()
+            var midPoint = floor(random(genesLength))
             
-            //verifica o tamanho dos genes
-            for (var i = 0; i < genesLength; i++) {if (window.CP.shouldStopExecution(2)) break;
-              if (i > midPoint) { //se o i for maior que o ponto sorteado
-                child.dna.genes[i] = this.dna.genes[i]; //atribui dentro do novo genes o valor gerado
+            for (var i = 0; i < genesLength; i++) {if (window.CP.shouldStopExecution(2)) break
+              if (i > midPoint) {
+                child.dna.genes[i] = this.dna.genes[i]
               } else { 
-                child.dna.genes[i] = partner.dna.genes[i]; //senão atribui o gene do chamado
+                child.dna.genes[i] = partner.dna.genes[i]
               }
-            }window.CP.exitedLoop(2);
+            }window.CP.exitedLoop(2)
         
-            child.dna.mutation();//chama a mutação
+            child.dna.mutation()
         
-            return child; // retorna o filho
-          };
+            return child
+          }
         
-          this.calcFitness = function () { //calculo de fitness
-            var distance = dist(this.position.x, this.position.y, targets[this.targetId].position.x, targets[this.targetId].position.y); //calcula a distancia
+          this.calcFitness = function () {
+            var distance = dist(this.position.x, this.position.y, targets[this.targetId].position.x, targets[this.targetId].position.y)
         
             // this.fitness = map(distance, 0, width, width, 0)
-            this.fitness = 1 / distance; //1 dividido pela a distancia
+            this.fitness = 1 / distance
         
             // this.fitness = norm(this.fitness, 0, 100)
             // this.fitness = distance/this.dna.genes.length
-            if (this.fitness > 0) { //se for maior que 0
-              this.fitness = pow(this.fitness, 2); // distancia elevado a 2
+            if (this.fitness > 0) {
+              this.fitness = pow(this.fitness, 2)
             }
         
-            if (this.complited) { //completado a rodada
-              this.fitness *= 1 + 10 / this.step; //novo fitness é calculado sobre ele * 1 + 10/ pelos pessos
+            if (this.complited) {
+              this.fitness *= 1 + 10 / this.step
             }
         
             // if(this.disqualified) {
@@ -178,9 +184,9 @@
             // console.log(this.fitness)
           };
         
-          this.applyForce = function (force) { //aplicação de força
-            this.acceleration.add(force); //adiciona a força na aceleração
-          };
+          this.applyForce = function (force) {
+            this.acceleration.add(force)
+          }
         
           this.changeTarget = function () {
         
@@ -188,28 +194,28 @@
             '#4124fb',
             '#fc0d1b',
             'yellow',
-            'black'];
+            'black']
         
         
-            if (this.complited) { //amostra atinge o objetivo
-              var targetId = this.targetId + 1; //adiciona mais ao valor de alvo
+            if (this.complited) {
+              var targetId = this.targetId + 1
         
-              this.color = colors[targetId]; //a muda a cor da amostra
+              this.color = colors[targetId]
         
-              if (targetId < targets.length) { //se o target for menor que a quantidade ja existente
-                this.targetId = targetId; //atribui a amostra o valor de target
-                this.complited = false; //completado false
+              if (targetId < targets.length) {
+                this.targetId = targetId
+                this.complited = false
         
                 // console.log(this.targetId)
               } else {
-                this.finish = true; //finalizado true
-                this.complited = true; // completo true
-                this.removeFromList(); //remove a lista
+                this.finish = true
+                this.complited = true
+                this.removeFromList()
               }
             }
-          };
+          }
         
-          this.move = function () { //função de mover
+          this.move = function () {
         
             // var distance = dist(this.position.x, this.position.y, targets[this.targetId].position.x, targets[this.targetId].position.y)
             // if(distance < (targets[this.targetId].width/2)) {
@@ -220,14 +226,14 @@
             // console.log(targets[this.targetId])
         
             if (targets[this.targetId].detect(this.position.x, this.position.y)) { 
-              this.complited = true;
-              this.changeTarget();
+              this.complited = true
+              this.changeTarget()
             }
         
         
             if (!this.disqualified && collision.detect(this.position.x, this.position.y)) {
-              this.disqualified = true;
-              this.removeFromList();
+              this.disqualified = true
+              this.removeFromList()
             }
         
         
@@ -237,177 +243,174 @@
               this.position.y > height ||
               this.position.y < 0)
               {
-                this.disqualified = true;
-                this.removeFromList();
+                this.disqualified = true
+                this.removeFromList()
               }
             }
         
-            this.applyForce(this.dna.genes[step]);
+            this.applyForce(this.dna.genes[step])
         
             if (!this.finish && !this.disqualified) {
-              this.velocity.add(this.acceleration);
-              this.position.add(this.velocity);
-              this.acceleration.mult(0);
+              this.velocity.add(this.acceleration)
+              this.position.add(this.velocity)
+              this.acceleration.mult(0)
               // this.velocity.limit(4)
             }
         
-            this.design();
-          };
+            this.design()
+          }
         
           this.design = function () {
-            push();
-            noStroke();
-            translate(this.position.x, this.position.y);
-            rotate(this.velocity.heading());
-            rectMode(CENTER);
-            fill(this.color);
-            rect(0, 0, this.length, this.width);
-            pop();
-          };
+            push()
+            noStroke()
+            translate(this.position.x, this.position.y)
+            rotate(this.velocity.heading())
+            rectMode(CENTER)
+            fill(this.color)
+            rect(0, 0, this.length, this.width)
+            pop()
+          }
         }
         
         function Population(x, y, w, h) {
-          this.cars = [];
-          this.size = populationSize;
-          this.matingPool = [];
+          this.cars = []
+          this.size = populationSize
+          this.matingPool = []
         
-          for (var i = 0; i < this.size; i++) {if (window.CP.shouldStopExecution(3)) break;
-            this.cars[i] = new Car(x, y, w, h);
-          }window.CP.exitedLoop(3);
+          for (var i = 0; i < this.size; i++) {if (window.CP.shouldStopExecution(3)) break
+            this.cars[i] = new Car(x, y, w, h)
+          }window.CP.exitedLoop(3)
         
           this.evaluate = function () {
-            // Calculate maximum fitness
-            var maxFitness = 0;
-            for (var i = 0; i < this.size; i++) {if (window.CP.shouldStopExecution(4)) break;
-              this.cars[i].calcFitness();
+            var maxFitness = 0
+            for (var i = 0; i < this.size; i++) {if (window.CP.shouldStopExecution(4)) break
+              this.cars[i].calcFitness()
               if (this.cars[i].fitness > maxFitness) {
-                maxFitness = this.cars[i].fitness;
+                maxFitness = this.cars[i].fitness
               }
-            }window.CP.exitedLoop(4);
-            stats.setMaxFitness(maxFitness);
+            }window.CP.exitedLoop(4)
+            stats.setMaxFitness(maxFitness)
         
-            // Calculate average fitness
-            var sumFitness = 0;
-            for (var i = 0; i < this.size; i++) {if (window.CP.shouldStopExecution(5)) break;
-              sumFitness += this.cars[i].fitness;
-            }window.CP.exitedLoop(5);
-            stats.setAvgFitness(sumFitness / this.size);
+            var sumFitness = 0
+            for (var i = 0; i < this.size; i++) {if (window.CP.shouldStopExecution(5)) break
+              sumFitness += this.cars[i].fitness
+            }window.CP.exitedLoop(5)
+            stats.setAvgFitness(sumFitness / this.size)
         
-            // Fitness normalization fitness/maxFitness
-            for (var i = 0; i < this.size; i++) {if (window.CP.shouldStopExecution(6)) break;
-              this.cars[i].fitness /= maxFitness;
+            for (var i = 0; i < this.size; i++) {if (window.CP.shouldStopExecution(6)) break
+              this.cars[i].fitness /= maxFitness
               // this.cars[i].fitness = norm(this.cars[i].fitness, 0, 10)
-            }window.CP.exitedLoop(6);
+            }window.CP.exitedLoop(6)
         
-            this.matingPool = [];
-            for (var i = 0; i < this.size; i++) {if (window.CP.shouldStopExecution(7)) break;
-              var n = this.cars[i].fitness * 100;
-              for (var j = 0; j < n; j++) {if (window.CP.shouldStopExecution(8)) break;
-                this.matingPool.push(this.cars[i]);
-              }window.CP.exitedLoop(8);
-            }window.CP.exitedLoop(7);
+            this.matingPool = []
+            for (var i = 0; i < this.size; i++) {if (window.CP.shouldStopExecution(7)) break
+              var n = this.cars[i].fitness * 100
+              for (var j = 0; j < n; j++) {if (window.CP.shouldStopExecution(8)) break
+                this.matingPool.push(this.cars[i])
+              }window.CP.exitedLoop(8)
+            }window.CP.exitedLoop(7)
         
-            this.selection();
+            this.selection()
         
-            generation++;
-            stats.setGeneration(generation);
-          };
+            generation++
+            stats.setGeneration(generation)
+          }
         
-          this.selection = function () { //função para a seleção
-            this.cars = []; //vetor de amostras
-            for (var i = 0; i < population.size; i++) {if (window.CP.shouldStopExecution(9)) break; //se i for menos que
-              var parentA = random(this.matingPool);
-              var parentB = random(this.matingPool);
-              var child = parentA.crossover(parentB);
-              this.cars.push(child);
-            }window.CP.exitedLoop(9);
-          };
+          this.selection = function () {
+            this.cars = []
+            for (var i = 0; i < population.size; i++) {if (window.CP.shouldStopExecution(9)) break
+              var parentA = random(this.matingPool)
+              var parentB = random(this.matingPool)
+              var child = parentA.crossover(parentB)
+              this.cars.push(child)
+            }window.CP.exitedLoop(9)
+          }
         
           this.run = function () {
-            for (var i = 0; i < population.size; i++) {if (window.CP.shouldStopExecution(10)) break;
-              this.cars[i].move();
-            }window.CP.exitedLoop(10);
-          };
+            for (var i = 0; i < population.size; i++) {if (window.CP.shouldStopExecution(10)) break
+              this.cars[i].move()
+            }window.CP.exitedLoop(10)
+          }
         }
         
         function DNA() {
-          this.genes = [];
+          this.genes = []
         
-          for (var i = 0; i < lifetime; i++) {if (window.CP.shouldStopExecution(11)) break;
-            this.genes[i] = p5.Vector.random2D();
-            this.genes[i].setMag(maxForce);
-          }window.CP.exitedLoop(11);
+          for (var i = 0; i < lifetime; i++) {if (window.CP.shouldStopExecution(11)) break
+            this.genes[i] = p5.Vector.random2D()
+            this.genes[i].setMag(maxForce)
+          }window.CP.exitedLoop(11)
         
           this.getLength = function () {
-            return this.genes.length;
+            return this.genes.length
           };
         
           this.mutation = function () {
-            for (var i = 0; i < this.getLength(); i++) {if (window.CP.shouldStopExecution(12)) break;
+            for (var i = 0; i < this.getLength(); i++) {if (window.CP.shouldStopExecution(12)) break
               if (random(1) < 0.01) {
-                this.genes[i] = p5.Vector.random2D();
-                this.genes[i].setMag(maxForce);
+                this.genes[i] = p5.Vector.random2D()
+                this.genes[i].setMag(maxForce)
               }
-            }window.CP.exitedLoop(12);
-          };
+            }window.CP.exitedLoop(12)
+          }
         }
         
         function Target(x, y, w, h) {
-          this.position = createVector(x, y);
-          this.width = w;
-          this.height = h;
+          this.position = createVector(x, y)
+          this.width = w
+          this.height = h
         
           this.show = function () {
             // fill(22, 183, 45)
-            fill(255, 255, 255);
-            noStroke();
-            ellipse(this.position.x, this.position.y, this.width, this.height);
-          };
+            fill(255, 255, 255)
+            noStroke()
+            ellipse(this.position.x, this.position.y, this.width, this.height)
+          }
         
           this.detect = function (posX, posY) {
             if (posX > this.position.x &&
             posX < this.position.x + this.width / 2 &&
             posY > this.position.y &&
             posY < this.position.y + this.height / 2) {
-              return true;
+              return true
             }
-          };
+          }
         }
-        //para o display
+
         function Stats() { 
-          this.populationSizeText = createP();
-          this.maxFitnessText = createP();
-          this.avgFitnessText = createP();
-          this.generationText = createP();
-          this.stepsText = createP();
-          this.carsCountText = createP();
+          this.populationSizeText = createP()
+          this.maxFitnessText = createP()
+          this.avgFitnessText = createP()
+          this.generationText = createP()
+          this.stepsText = createP()
+          this.carsCountText = createP()
         
-          this.populationSizeText.html('Amostras: ' + populationSize);
-          this.maxFitnessText.html('max. fitness: 0');
-          this.avgFitnessText.html('media fitness: 0');
-          this.generationText.html('generações: 1');
-          this.stepsText.html('steps: 0');
-          this.carsCountText.html('cars left: ' + populationSize);
+          this.populationSizeText.html('Nº de mostras: ' + populationSize)
+          this.maxFitnessText.html('max. fitness: 0')
+          this.avgFitnessText.html('media fitness: 0')
+          this.generationText.html('generações: 1')
+          this.stepsText.html('steps: 0')
+          this.carsCountText.html('cars left: ' + populationSize)
         
           this.setMaxFitness = function (value) {
-            this.maxFitnessText.html('max fitness: ' + value);
-          };
+            this.maxFitnessText.html('max. fitness: ' + value)
+          }
         
           this.setAvgFitness = function (value) {
-            this.avgFitnessText.html('avg fitness: ' + value);
-          };
+            this.avgFitnessText.html('média fitness: ' + value)
+          }
         
           this.setGeneration = function (value) {
-            this.generationText.html('generation: ' + value);
-          };
+            this.generationText.html('geração: ' + value)
+          }
         
           this.setSteps = function (value) {
-            this.stepsText.html('steps: ' + value);
-          };
+            this.stepsText.html('time: ' + value)
+          }
         
           this.setCarsCount = function (value) {
-            this.carsCountText.html('cars left: ' + value);
-          };
+            this.carsCountText.html('amostra(s) restante(s): ' + value)
+          }
         }
         //# sourceURL=pen.js
       </script>
